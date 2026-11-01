@@ -1,0 +1,32 @@
+[tasks.preflight]
+description = "Names a missing Rust toolchain or cargo-nextest before a build turns it into an obscure error"
+dir = "{{config_root}}"
+run = ["rustc --version", "cargo --version", "cargo nextest --version"]
+
+[tasks.check]
+description = "cargo check, clippy with warnings denied, and rustfmt check over the workspace"
+dir = "{{config_root}}"
+run = [
+  "cargo check --workspace --all-targets",
+  "cargo clippy --workspace --all-targets -- -D warnings",
+  "cargo fmt --all --check",
+]
+
+[tasks.test]
+description = "Every workspace test through cargo-nextest"
+dir = "{{config_root}}"
+run = "cargo nextest run --workspace"
+
+[tasks.package]
+description = "Builds the AMML mod into dist/@alaydriem/peek (alaydriem_peek.dll and amml.hcl); that folder is the release artifact"
+dir = "{{config_root}}"
+shell = "bash -c"
+run = '''
+set -e
+cargo build --release -p peek-amml
+rm -rf dist/alaydriem-peek
+mkdir -p dist/@alaydriem/peek
+cp target/release/alaydriem_peek.dll dist/@alaydriem/peek/alaydriem_peek.dll
+cp peek/amml/amml.hcl dist/@alaydriem/peek/amml.hcl
+echo "built dist/@alaydriem/peek"
+'''
