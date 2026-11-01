@@ -38,7 +38,7 @@ folder of the game, so that the files are in `mods/amml/@alaydriem/peek/`. Then 
 
 | Peek | Minecraft Bedrock | Mod Manager |
 | --- | --- | --- |
-| 0.1.0 | 1.26.60 | ABI 2.x |
+| 26.60.0 | 1.26.60 | ABI 2.x |
 
 ## Configuration
 

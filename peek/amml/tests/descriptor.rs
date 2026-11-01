@@ -10,7 +10,7 @@ fn the_descriptor_passes_the_manager_checker_with_no_claim_keybind_or_setting() 
     assert_eq!(descriptor.name, "peek");
     assert_eq!(descriptor.id(), "@alaydriem/peek");
     assert_eq!(descriptor.display_name, "Shulker Peek");
-    assert_eq!(descriptor.version, "0.1.0");
+    assert_eq!(descriptor.version, env!("CARGO_PKG_VERSION"));
     assert_eq!(descriptor.author, "Alaydriem");
     assert!(descriptor.claims.is_empty());
     assert!(descriptor.keybinds.is_empty());
