@@ -549,7 +549,7 @@ dependencies = [
 
 [[package]]
 name = "peek-amml"
-version = "26.60.0"
+version = "26.60.5"
 dependencies = [
  "amm-client",
  "amm-core",
@@ -564,7 +564,7 @@ dependencies = [
 
 [[package]]
 name = "peek-core"
-version = "26.60.0"
+version = "26.60.5"
 
 [[package]]
 name = "pin-project-lite"
