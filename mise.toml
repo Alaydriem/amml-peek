@@ -28,6 +28,7 @@ rm -rf dist/alaydriem-peek dist/@alaydriem/peek
 mkdir -p dist/@alaydriem/peek
 cp target/release/alaydriem_peek.dll dist/@alaydriem/peek/alaydriem_peek.dll
 cp peek/amml/amml.hcl dist/@alaydriem/peek/amml.hcl
+cp peek/amml/icon.png dist/@alaydriem/peek/icon.png
 echo "built dist/@alaydriem/peek"
 '''
 

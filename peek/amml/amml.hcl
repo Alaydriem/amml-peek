@@ -43,3 +43,17 @@ entries = [
   "UIScene.handleDirection",
   "UIScene.mScreenView",
 ]
+
+listing {
+  title       = "Peek"
+  summary     = "See inside a shulker box by hovering over it."
+  description = <<-EOT
+    Peek inside shulker boxes from any in-game container to preview their contents, with support for durability, stack sizes, and even bundles.
+  EOT
+  authors     = ["Charles R. Portwood II"]
+  license     = "BSD-3-Clause"
+  source      = "https://github.com/alaydriem/amml-peek"
+  homepage    = "https://github.com/alaydriem/amml-peek#readme"
+  tags        = ["shulker", "inventory", "preview", "client", "utility"]
+  icon        = "icon.png"
+}

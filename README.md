@@ -4,9 +4,9 @@
 
 # Alaydriem's Peek
 
-[![Release](https://img.shields.io/github/v/release/alaydriem/peek?include_prereleases)](https://github.com/alaydriem/peek/releases)
-[![Build](https://img.shields.io/github/actions/workflow/status/alaydriem/peek/build.yml?branch=master&label=build)](https://github.com/alaydriem/peek/actions/workflows/build.yml)
-[![License](https://img.shields.io/github/license/alaydriem/peek)](./LICENSE)
+[![Release](https://img.shields.io/github/v/release/alaydriem/amml-peek?include_prereleases)](https://github.com/alaydriem/amml-peek/releases)
+[![Build](https://img.shields.io/github/actions/workflow/status/alaydriem/amml-peek/build.yml?branch=master&label=build)](https://github.com/alaydriem/amml-peek/actions/workflows/build.yml)
+[![License](https://img.shields.io/github/license/alaydriem/amml-peek)](./LICENSE)
 ![Minecraft Bedrock](https://img.shields.io/badge/Minecraft_Bedrock-1.26.60-62B47A)
 [![AMML](https://img.shields.io/badge/AMML-mod-4A90D9)](https://github.com/alaydriem/amml)
 
@@ -25,20 +25,7 @@ Client-side only. It reads inventory data the game already has and sends nothing
 
 ## Installation
 
-Requires:
-
-- the **AMML loader**, which loads the mod into the game. The loader also carries the recipes that find the game
-  addresses the mod uses (in its `recipes/`). An older loader does not have them and the preview stays off. Update
-  the loader first.
-- [Alaydriem's Mod Manager](https://github.com/alaydriem/modmanager). Without the mod manager the preview stays off.
-
-Download the zip from the [latest release](https://github.com/alaydriem/peek/releases/latest) and extract it.
-It holds the folder `@alaydriem/peek`, with `alaydriem_peek.dll` and `amml.hcl`. Put that folder in the AMML mods
-folder of the game, so that the files are in `mods/amml/@alaydriem/peek/`. Then enable the mod in the mod manager.
-
-| Peek | Minecraft Bedrock | Mod Manager |
-| --- | --- | --- |
-| 26.60.0 | 1.26.60 | ABI 2.x |
+Install it with the [AMML launcher](https://github.com/alaydriem/amml/releases/latest). The launcher also installs the AMML loader and Alaydriem's Mod Manager, which this mod needs.
 
 ## Configuration
 
@@ -46,7 +33,7 @@ There are no settings. Turn the preview on or off in the mod manager.
 
 ## Building
 
-Requires Windows x64, [mise](https://mise.jdx.dev), rustup and [cargo-nextest](https://nexte.st). The `amml` and `modmanager-amml` repos must sit next to this one.
+Requires Windows x64, [mise](https://mise.jdx.dev), rustup and [cargo-nextest](https://nexte.st). The AMML SDK and the mod manager crates are git dependencies on their public release tags (`Cargo.toml`); cargo fetches them. No sibling repos are needed.
 
 ```powershell
 mise trust
