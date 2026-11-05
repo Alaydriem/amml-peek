@@ -2,6 +2,7 @@ namespace   = "alaydriem"
 name        = "peek"
 entry       = "alaydriem_peek.dll"
 api_version = 2
+amml_version = "26.60.6"
 entries = [
   # game.ui_render: required, the panel is drawn in the screen view render call
   "ScreenView.render",
