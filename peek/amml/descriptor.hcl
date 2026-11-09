@@ -1,0 +1,6 @@
+namespace    = "alaydriem"
+name         = "peek"
+display_name = "Shulker Peek"
+version      = "26.62.0"
+author       = "Alaydriem"
+config_path  = "config.hcl"
