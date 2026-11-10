@@ -35,4 +35,4 @@ jobs:
       namespace: alaydriem
       name: peek
       package_task: package
-      descriptor: peek/amml/descriptor.hcl
+      descriptor: src/amml/descriptor.hcl

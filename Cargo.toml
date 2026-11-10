@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["peek/core", "peek/amml"]
+members = ["src/core", "src/amml"]
 
 [workspace.package]
 version = "26.62.0"
@@ -13,7 +13,7 @@ publish = false
 [workspace.dependencies]
 curia = "=0.2.2"
 hcl-rs = "=0.19.8"
-peek-core = { path = "peek/core" }
+peek-core = { path = "src/core" }
 amm-client = { git = "https://github.com/Alaydriem/amml-modmanager.git", tag = "26.62.0", default-features = false }
 amm-core = { git = "https://github.com/Alaydriem/amml-modmanager.git", tag = "26.62.0" }
 amml-sdk = { git = "https://github.com/Alaydriem/amml.git", tag = "26.62.0" }

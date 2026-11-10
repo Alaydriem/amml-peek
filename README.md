@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/icon.png" alt="Peek" width="256">
+<img src="./assets/readme.png" alt="Peek" width="256">
 
 # Alaydriem's Peek
 
@@ -42,7 +42,7 @@ mise run package
 mise run test
 ```
 
-`mise run package` writes `dist/@alaydriem/peek`.
+`mise run package` writes `dist/@alaydriem/peek`. `mise run install --instance <name>` runs `package`, then copies it into `%LOCALAPPDATA%\amml\instances\<name>\mods\amml\@alaydriem\peek\`. Close the game first.
 
 ## License
 
