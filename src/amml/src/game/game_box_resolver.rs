@@ -1,47 +1,58 @@
-use amml_game::ContainerScreenController;
-use amml_msvc::{MsvcHeap, MsvcString};
+use amml_api::{Collection, ContainerScreen, ScreenId, SlotAt};
 use peek_core::services::ShulkerName;
-use peek_core::structs::HoveredSlot;
+use peek_core::structs::{HoveredSlot, SlotCollection};
 
 use crate::game::GameBox;
 use crate::traits::BoxResolver;
 use crate::types::{PreviewKey, ResolvedBox};
 
-/// Finds the shulker box in the slot the pointer is over, through the container screen controller. Client main
-/// thread; the stack belongs to the game and is read only.
-pub struct GameBoxResolver<'a> {
-    container: &'a ContainerScreenController<'static>,
-    heap: MsvcHeap,
+/// Finds the shulker box in the slot the pointer is over, through the container screen of the running render call.
+/// Game thread; the stack belongs to the game and is read only.
+pub struct GameBoxResolver<'a, 'f> {
+    screen: &'a ContainerScreen<'f>,
 }
 
-impl<'a> GameBoxResolver<'a> {
-    /// `heap` must be the game heap.
-    pub fn new(container: &'a ContainerScreenController<'static>, heap: MsvcHeap) -> Self {
-        Self { container, heap }
+impl<'a, 'f> GameBoxResolver<'a, 'f> {
+    pub fn new(screen: &'a ContainerScreen<'f>) -> Self {
+        Self { screen }
+    }
+
+    /// The slot the API names for a hovered slot; `None` for a collection the API does not serve.
+    pub fn slot_at(slot: &HoveredSlot) -> Option<SlotAt> {
+        let collection = match slot.collection {
+            SlotCollection::Container => Collection::Container,
+            SlotCollection::Hotbar => Collection::Hotbar,
+            SlotCollection::Inventory => Collection::Inventory,
+            SlotCollection::Other => return None,
+        };
+        Some(SlotAt { collection, index: slot.index })
     }
 }
 
-impl BoxResolver for GameBoxResolver<'_> {
-    type Source = GameBox<'static>;
+impl BoxResolver for GameBoxResolver<'_, '_> {
+    type Source = GameBox;
 
-    #[allow(unsafe_code)]
-    fn resolve(&self, slot: &HoveredSlot) -> Option<ResolvedBox<GameBox<'static>>> {
-        // SAFETY: the heap is the game's operator new and delete.
-        let mut name = unsafe { MsvcString::new_in(&self.heap, &slot.collection) }.ok()?;
-        let stack = self.container.visual_item(&name, slot.index);
-        // SAFETY: the string came from this heap, and the call that read it has returned.
-        unsafe { name.release(&self.heap) };
-        let stack = stack?;
+    fn key(&self, slot: &HoveredSlot) -> Option<PreviewKey> {
+        let at = Self::slot_at(slot)?;
+        let stack = self.screen.visual_item(at)?;
+        if stack.is_empty() {
+            return None;
+        }
+        Some(PreviewKey {
+            screen: ScreenId(slot.screen),
+            slot: at,
+            identity: stack.identity(),
+            aux: stack.aux(),
+            count: stack.count(),
+            change_stamp: stack.change_stamp(),
+        })
+    }
+
+    fn load(&self, slot: &HoveredSlot) -> Option<ResolvedBox<GameBox>> {
+        let stack = self.screen.visual_item(Self::slot_at(slot)?)?;
         if stack.is_empty() || !ShulkerName::is_shulker(&stack.type_name()?) {
             return None;
         }
-        let user_data = stack.user_data();
-        let key = PreviewKey {
-            stack: stack.as_ptr() as usize,
-            user_data: user_data.as_ref().map_or(0, |tag| tag.as_ptr() as usize),
-            count: stack.count()?,
-        };
-        let contents = user_data.and_then(|tag| tag.list("Items")).map(|list| GameBox::new(list, self.heap));
-        Some(ResolvedBox { key, contents })
+        Some(ResolvedBox { contents: stack.container_contents().map(GameBox::new) })
     }
 }

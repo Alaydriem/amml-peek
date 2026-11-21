@@ -6,7 +6,7 @@ use crate::traits::Canvas;
 use crate::types::{PanelStyle, PreviewItem};
 
 /// Draws the panel through a canvas: the frame and the cells, the items, the durability and fill bars, then the
-/// counts and the hint.
+/// counts and the hint, which the canvas draws as text over everything.
 pub struct PreviewRenderer;
 
 impl PreviewRenderer {
@@ -66,24 +66,17 @@ impl PreviewRenderer {
                 Self::fill_bar(item, icon, canvas);
             }
         }
-        let mut queued = false;
         for slot in 0..Self::SLOTS {
             let Some(text) = cache.item(slot).and_then(|item| item.count_text.as_deref()) else { continue };
             canvas.count(text, layout.cell(slot));
-            queued = true;
         }
         for position in 0..layout.strip_cells() {
             let Some(text) = cache.strip_item(position).and_then(|item| item.count_text.as_deref()) else { continue };
             let Some(cell) = layout.strip_cell(position) else { continue };
             canvas.count(text, cell);
-            queued = true;
         }
         if let (Some(text), Some(area)) = (hint, layout.hint()) {
             canvas.label(text, area);
-            queued = true;
-        }
-        if queued {
-            canvas.flush_text();
         }
     }
 
