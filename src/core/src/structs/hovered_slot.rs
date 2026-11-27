@@ -1,6 +1,8 @@
-#[derive(Debug, Clone, PartialEq, Eq)]
+use crate::structs::SlotCollection;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct HoveredSlot {
-    pub controller: usize,
-    pub collection: String,
+    pub screen: u64,
+    pub collection: SlotCollection,
     pub index: i32,
 }

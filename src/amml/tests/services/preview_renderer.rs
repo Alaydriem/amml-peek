@@ -3,6 +3,7 @@ use std::rc::Rc;
 
 use alaydriem_peek::services::{PreviewCache, PreviewRenderer};
 use alaydriem_peek::types::PreviewKey;
+use amml_api::{Collection, ScreenId, SlotAt};
 use peek_core::services::FillBar;
 use peek_core::structs::{DurabilityBar, Point, PreviewLayout, Rect, Rgb};
 
@@ -16,7 +17,17 @@ fn cache_of(entries: Vec<FakeEntry>) -> (PreviewCache<TrackedStack>, Rc<Cell<usi
     let drops = Rc::new(Cell::new(0));
     let source = FakeBox::new(&drops, entries);
     let mut cache = PreviewCache::new();
-    cache.sync(PreviewKey { stack: 1, user_data: 2, count: 1 }, Some(&source));
+    cache.sync(
+        PreviewKey {
+            screen: ScreenId(1),
+            slot: SlotAt { collection: Collection::Container, index: 0 },
+            identity: Some(2),
+            aux: None,
+            count: 1,
+            change_stamp: None,
+        },
+        Some(&source),
+    );
     (cache, drops)
 }
 
@@ -41,7 +52,7 @@ fn an_empty_box_draws_the_frame_27_cells_and_the_border_and_nothing_else() {
 }
 
 #[test]
-fn items_bars_and_counts_follow_the_fills_in_that_order_and_the_text_is_flushed_last() {
+fn items_bars_and_counts_follow_the_fills_in_that_order_and_the_text_is_last() {
     let layout = layout();
     let (cache, _drops) = cache_of(vec![
         FakeEntry::item(Some(0), "stone").counted("64"),
@@ -69,7 +80,6 @@ fn items_bars_and_counts_follow_the_fills_in_that_order_and_the_text_is_flushed_
         CanvasOp::Fill { area: bar.background(layout.icon(2)), color: rgb(0.0, 0.0, 0.0), alpha: 1.0 },
         CanvasOp::Fill { area: bar.foreground(layout.icon(2)), color: bar.color(), alpha: 1.0 },
         CanvasOp::Count { text: "64".to_string(), cell: layout.cell(0) },
-        CanvasOp::FlushText,
     ];
     assert_eq!(tail, expected.as_slice());
 }
@@ -112,7 +122,7 @@ fn a_nearly_broken_item_keeps_the_black_strip_and_has_no_fill() {
 }
 
 #[test]
-fn text_is_flushed_once_and_only_when_a_count_was_queued() {
+fn a_count_is_drawn_only_for_a_stack_with_a_count_text() {
     let layout = layout();
     let (cache, _drops) =
         cache_of(vec![FakeEntry::item(Some(0), "stone").counted("12"), FakeEntry::item(Some(5), "dirt").counted("3")]);
@@ -120,16 +130,14 @@ fn text_is_flushed_once_and_only_when_a_count_was_queued() {
 
     PreviewRenderer::draw(&layout, &cache, None, None, &mut canvas);
 
-    let flushes = canvas.ops.iter().filter(|op| **op == CanvasOp::FlushText).count();
-    assert_eq!(flushes, 1);
-    assert_eq!(canvas.ops.last(), Some(&CanvasOp::FlushText));
     let counts: Vec<&CanvasOp> = canvas.ops.iter().filter(|op| matches!(op, CanvasOp::Count { .. })).collect();
     assert_eq!(counts.len(), 2);
+    assert!(matches!(canvas.ops.last(), Some(CanvasOp::Count { .. })));
 
     let (plain, _drops) = cache_of(vec![FakeEntry::item(Some(0), "stone")]);
     let mut quiet = RecordingCanvas::default();
     PreviewRenderer::draw(&layout, &plain, None, None, &mut quiet);
-    assert!(!quiet.ops.contains(&CanvasOp::FlushText));
+    assert!(!quiet.ops.iter().any(|op| matches!(op, CanvasOp::Count { .. } | CanvasOp::Label { .. })));
 }
 
 fn panel_layout(strip_rows: usize, hint: bool) -> PreviewLayout {
@@ -148,7 +156,17 @@ fn bundle_cache() -> (PreviewCache<TrackedStack>, FakeBox, Rc<Cell<usize>>) {
         ],
     );
     let mut cache = PreviewCache::new();
-    cache.sync(PreviewKey { stack: 1, user_data: 2, count: 1 }, Some(&source));
+    cache.sync(
+        PreviewKey {
+            screen: ScreenId(1),
+            slot: SlotAt { collection: Collection::Container, index: 0 },
+            identity: Some(2),
+            aux: None,
+            count: 1,
+            change_stamp: None,
+        },
+        Some(&source),
+    );
     cache.sync_strip(Some(&source), Some(1));
     (cache, source, drops)
 }
@@ -190,13 +208,12 @@ fn the_panel_with_a_strip_draws_in_the_documented_order() {
         fill(bar.foreground(strip_icon(1)), bar.color()),
         CanvasOp::Count { text: "5".to_string(), cell: layout.strip_cell(0).unwrap() },
         CanvasOp::Label { text: "Shift + scroll: next bundle (1/2)".to_string(), area: layout.hint().unwrap() },
-        CanvasOp::FlushText,
     ]);
     assert_eq!(canvas.ops, expected);
 }
 
 #[test]
-fn the_hint_is_one_label_and_one_flush_and_no_hint_draws_no_label() {
+fn the_hint_is_one_label_and_no_hint_draws_no_label() {
     let layout = panel_layout(1, true);
     let (cache, _source, _drops) = bundle_cache();
     let mut hinted = RecordingCanvas::default();
@@ -206,7 +223,6 @@ fn the_hint_is_one_label_and_one_flush_and_no_hint_draws_no_label() {
     PreviewRenderer::draw(&panel_layout(1, false), &cache, Some(1), None, &mut quiet);
 
     assert_eq!(hinted.ops.iter().filter(|op| matches!(op, CanvasOp::Label { .. })).count(), 1);
-    assert_eq!(hinted.ops.iter().filter(|op| **op == CanvasOp::FlushText).count(), 1);
     assert!(!quiet.ops.iter().any(|op| matches!(op, CanvasOp::Label { .. })));
 }
 
@@ -240,7 +256,17 @@ fn an_empty_strip_draws_one_row_of_cells() {
     let drops = Rc::new(Cell::new(0));
     let source = FakeBox::new(&drops, vec![FakeEntry::item(Some(0), "bundle").bundle(Some(1), Some(vec![]))]);
     let mut cache = PreviewCache::new();
-    cache.sync(PreviewKey { stack: 1, user_data: 2, count: 1 }, Some(&source));
+    cache.sync(
+        PreviewKey {
+            screen: ScreenId(1),
+            slot: SlotAt { collection: Collection::Container, index: 0 },
+            identity: Some(2),
+            aux: None,
+            count: 1,
+            change_stamp: None,
+        },
+        Some(&source),
+    );
     cache.sync_strip(Some(&source), Some(0));
     let mut canvas = RecordingCanvas::default();
 

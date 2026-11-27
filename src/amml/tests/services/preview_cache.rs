@@ -3,13 +3,22 @@ use std::rc::Rc;
 
 use alaydriem_peek::services::PreviewCache;
 use alaydriem_peek::types::PreviewKey;
+use amml_api::{Collection, ScreenId, SlotAt};
 
 use crate::support::{FakeBox, FakeEntry, LogCapture, TrackedStack};
 
 const SKIPPED: &str = "shulker box entries skipped";
 
-fn key(stack: usize, user_data: usize, count: u8) -> PreviewKey {
-    PreviewKey { stack, user_data, count }
+// the first number is the screen, the second the identity of the stack, the third its count
+fn key(screen: u64, identity: u64, count: u8) -> PreviewKey {
+    PreviewKey {
+        screen: ScreenId(screen),
+        slot: SlotAt { collection: Collection::Container, index: 0 },
+        identity: Some(identity),
+        aux: None,
+        count,
+        change_stamp: None,
+    }
 }
 
 fn drops() -> Rc<Cell<usize>> {

@@ -1,49 +1,102 @@
-namespace   = "alaydriem"
-name        = "peek"
-entry       = "alaydriem_peek.dll"
-api_version = 2
-amml_version = "26.60.6"
-entries = [
-  # game.ui_render: required, the panel is drawn in the screen view render call
-  "ScreenView.render",
-  "ScreenView.mPointerLocationPrevious",
-  "MinecraftUIRenderContext.mScreenContext",
-  "MinecraftUIRenderContext.fillRectangle",
-  "MinecraftUIRenderContext.drawRectangle",
-  "MinecraftUIRenderContext.drawText",
-  "MinecraftUIRenderContext.flushText",
-  # game.container_hover: required, which slot the pointer is over, and the shulker box hover text
-  "ScreenController.isContainerScreen",
-  "ScreenController.dtor",
-  "ContainerScreenController.onContainerSlotHovered",
-  "ContainerScreenController.onContainerSlotUnhovered",
-  "ContainerScreenController.getVisualItemStackImpl",
-  "ShulkerBoxBlockItem.appendFormattedHovertext",
-  "Item.appendFormattedHovertext",
-  # game.item_draw: required, the item pictures, the glint and the durability
-  "ItemRenderer.renderGuiItemNew",
-  "BaseActorRenderContext.ctor",
-  "BaseActorRenderContext.dtor",
-  "BaseActorRenderContext.size",
-  "ClientInstance.getMinecraftGame",
-  "Item.getAnimationFrameFor",
-  "Item.isGlint",
-  "Item.getMaxDamage",
-  "ItemStackBase.getDamageValue",
-  "ItemStackBase.isDamaged",
-  # game.item_nbt: required, the stored items of the box
-  "CompoundTag.nodeVariantIndex",
-  "ItemStack.fromTag",
-  "Item.mFullName",
-  # peek.font: optional, without it the stack counts are not drawn
-  "ClientInstance.getFontHandle",
-  "FontHandle.dtor",
-  "FontHandle.size",
-  "Font.getLineLength",
-  # game.ui_scroll: optional, the wheel notch that picks a bundle; without it the first bundle shows and the hint is not drawn
-  "UIScene.handleDirection",
-  "UIScene.mScreenView",
-]
+namespace    = "alaydriem"
+name         = "peek"
+entry        = "alaydriem_peek.dll"
+api_version  = 3
+
+uses {
+  feature "preview" {
+    event "ui.screen_render" {
+      version  = 1
+      required = true
+    }
+    event "ui.container_slot_hover" {
+      version  = 1
+      required = true
+    }
+    event "ui.container_slot_unhover" {
+      version  = 1
+      required = true
+    }
+    event "ui.screen_closing" {
+      version  = 1
+      required = true
+    }
+    event "registry.provider_ready" {
+      version  = 1
+      required = true
+    }
+    event "registry.provider_gone" {
+      version  = 1
+      required = true
+    }
+    event "mods.loaded" {
+      version  = 1
+      required = true
+    }
+    area "ui.draw" {
+      version  = 2
+      required = true
+    }
+    area "ui.screen" {
+      version  = 2
+      required = true
+    }
+    area "inventory.read" {
+      version  = 4
+      required = true
+    }
+    event "input.lease_suspended" {
+      version  = 1
+      required = false
+    }
+    event "input.lease_resumed" {
+      version  = 1
+      required = false
+    }
+    event "input.lease_lost" {
+      version  = 1
+      required = false
+    }
+    event "input.injected_released" {
+      version  = 2
+      required = false
+    }
+    event "overlay.screenshot_taken" {
+      version  = 1
+      required = false
+    }
+    event "overlay.screenshot_written" {
+      version  = 1
+      required = false
+    }
+    area "input.lease" {
+      version  = 1
+      required = false
+    }
+  }
+  feature "counts" {
+    area "ui.text" {
+      version  = 1
+      required = true
+    }
+  }
+  feature "bundle_pick" {
+    event "input.ui_scroll" {
+      version  = 1
+      required = true
+    }
+    event "input.key" {
+      version  = 1
+      required = true
+    }
+  }
+  feature "hovertext" {
+    event "ui.item_hovertext" {
+      version  = 1
+      required = true
+    }
+  }
+}
 
 listing {
   title       = "Peek"

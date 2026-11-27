@@ -1,4 +1,4 @@
-use crate::structs::HoveredSlot;
+use crate::structs::{HoveredSlot, SlotCollection};
 
 /// Tracks the one slot the pointer is over. An unhover only clears the slot it names, so a
 /// hover of the next slot that arrives before the unhover of the last one stays current.
@@ -12,31 +12,19 @@ impl HoverTracker {
         HoverTracker { current: None }
     }
 
-    pub fn hovered(&mut self, controller: usize, collection: &str, index: i32) {
-        match &mut self.current {
-            Some(slot) => {
-                slot.controller = controller;
-                slot.collection.clear();
-                slot.collection.push_str(collection);
-                slot.index = index;
-            }
-            None => self.current = Some(HoveredSlot { controller, collection: collection.to_owned(), index }),
-        }
+    pub fn hovered(&mut self, screen: u64, collection: SlotCollection, index: i32) {
+        self.current = Some(HoveredSlot { screen, collection, index });
     }
 
-    pub fn unhovered(&mut self, controller: usize, collection: &str, index: i32) {
-        let matches = self
-            .current
-            .as_ref()
-            .is_some_and(|slot| slot.controller == controller && slot.collection == collection && slot.index == index);
-        if matches {
+    pub fn unhovered(&mut self, screen: u64, collection: SlotCollection, index: i32) {
+        if self.current == Some(HoveredSlot { screen, collection, index }) {
             self.current = None;
         }
     }
 
-    /// The screen of `controller` closed.
-    pub fn left(&mut self, controller: usize) {
-        if self.current.as_ref().is_some_and(|slot| slot.controller == controller) {
+    /// The screen `screen` closed.
+    pub fn left(&mut self, screen: u64) {
+        if self.current.is_some_and(|slot| slot.screen == screen) {
             self.current = None;
         }
     }
@@ -46,11 +34,11 @@ impl HoverTracker {
     }
 
     /// The screen the current slot is on.
-    pub fn controller(&self) -> Option<usize> {
-        self.current.as_ref().map(|slot| slot.controller)
+    pub fn screen(&self) -> Option<u64> {
+        self.current.map(|slot| slot.screen)
     }
 
-    pub fn current_for(&self, controller: usize) -> Option<&HoveredSlot> {
-        self.current.as_ref().filter(|slot| slot.controller == controller)
+    pub fn current_for(&self, screen: u64) -> Option<&HoveredSlot> {
+        self.current.as_ref().filter(|slot| slot.screen == screen)
     }
 }

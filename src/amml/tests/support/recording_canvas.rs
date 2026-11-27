@@ -10,7 +10,6 @@ pub enum CanvasOp {
     Item { name: String, icon: Rect, foil: bool, alpha: f32, z_order: i32 },
     Count { text: String, cell: Rect },
     Label { text: String, area: Rect },
-    FlushText,
 }
 
 // a canvas that keeps every call in order
@@ -40,9 +39,5 @@ impl Canvas for RecordingCanvas {
 
     fn label(&mut self, text: &str, area: Rect) {
         self.ops.push(CanvasOp::Label { text: text.to_string(), area });
-    }
-
-    fn flush_text(&mut self) {
-        self.ops.push(CanvasOp::FlushText);
     }
 }

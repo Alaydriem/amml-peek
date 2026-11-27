@@ -1,4 +1,4 @@
-mod manager_session;
+mod peek_link;
 mod preview_cache;
 mod preview_panel;
 mod preview_renderer;
