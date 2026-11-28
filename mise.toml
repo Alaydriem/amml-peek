@@ -76,3 +76,14 @@ mkdir -p "$target"
 cp -r dist/@alaydriem/peek/. "$target/"
 echo "installed dist/@alaydriem/peek -> $target"
 '''
+
+[tasks.ingame]
+description = "Packages peek and modmanager and runs them in game on an AMML test instance through amml's mod-neutral runner (mise run ingame-run, see docs/ingame.md in amml); the steps and checks are in scripts/ingame-steps.sh. Plays in the world amml-test-peek. Passes on 'ingame peek: pass'"
+dir = "{{config_root}}"
+shell = "bash -c"
+usage = '''
+flag "--instance <name>" required=#true help="The test instance folder under %LOCALAPPDATA%/amml/instances"
+flag "--amml <dir>" help="The amml checkout; default: AMML_DIR, else ../amml"
+flag "--modmanager <dir>" help="The modmanager checkout; default: AMML_MODMANAGER_DIR, else ../modmanager"
+'''
+run = "bash scripts/ingame.sh"
